@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\MailgunController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\OrderController;
 use App\Http\Middleware\ValidateMailgunWebhook;
 use Illuminate\Http\Request;
@@ -17,7 +17,8 @@ Route
         'prefix' => 'customers',
     ], function () {
         Route
-            ::get('get/all', [CustomerController::class, 'getAll']);
+            ::get('get/all', [CustomerController::class, 'getAll'])
+            ->middleware(['auth:sanctum']);
     });
 
 Route
@@ -28,21 +29,31 @@ Route
             'prefix' => 'get',
         ], function () {
             Route
-                ::get('all', [OrderController::class, 'getAll']);
+                ::get('all', [OrderController::class, 'getAll'])
+                ->middleware(['auth:sanctum']);
             Route
-                ::post('customer/{customerUuid}', [OrderController::class, 'getByCustomerUuid']);
+                ::post('customer/{customerUuid}', [OrderController::class, 'getByCustomerUuid'])
+                ->middleware(['auth:sanctum']);
             Route
-                ::get('{uuid}', [OrderController::class, 'getByUuid']);
+                ::get('{uuid}', [OrderController::class, 'getByUuid'])
+                ->middleware(['auth:sanctum']);
         });
     });
 
 Route
     ::group([
-        'prefix' => 'mailgun',
+        'prefix' => 'email',
     ], function () {
         Route
-            ::post('store', [MailgunController::class, 'store'])
-            ->middleware(ValidateMailgunWebhook::class);
+            ::post('store', [EmailController::class, 'store'])
+            ->middleware((function () {
+                return [match (true) {
+                    config('mail.default') === 'mailgun' => ValidateMailgunWebhook::class,
+                    // ... condition => middleware
+                    default => null,
+                }];
+            })());
         Route
-            ::post('send-reply', [MailgunController::class, 'sendReply']);
+            ::post('send-reply', [EmailController::class, 'sendReply'])
+            ->middleware(['auth:sanctum']);
     });

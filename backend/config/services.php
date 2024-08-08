@@ -37,7 +37,8 @@ return [
 
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
-        'secret' => env('MAILGUN_WEBHOOK_KEY'),
+        'secret' => env('MAILGUN_API_KEY'),
+        'webhook_secret' => env('MAILGUN_WEBHOOK_KEY'),
         'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
         'scheme' => 'https',
     ],

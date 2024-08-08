@@ -74,28 +74,28 @@ export const InlineHtmlEventsList = [
     'onunload',
     'onvolumechange',
     'onwaiting',
-];
+]
 
 
 export function getInlineHtmlEventsListForQueryAll () {
-    let query = '';
+    let query = ''
     InlineHtmlEventsList.forEach((htmlEvent, index) => {
-        query += `*[${htmlEvent}]`;
+        query += `*[${htmlEvent}]`
         if (index < InlineHtmlEventsList.length - 1) {
-            query += ', ';
+            query += ', '
         }
-    });
-    return query;
+    })
+    return query
 }
 
 export function stripAwayAllInlineHtmlEvents (htmlElement) {
     htmlElement.querySelectorAll(getInlineHtmlEventsListForQueryAll()).forEach((node) => {
         InlineHtmlEventsList.forEach((inlineHtmlEvent) => {
             if (node.hasAttribute(inlineHtmlEvent)) {
-                node.removeAttribute(inlineHtmlEvent);
+                node.removeAttribute(inlineHtmlEvent)
             }
-        });
-    });
+        })
+    })
 }
 
-export default InlineHtmlEventsList;
+export default InlineHtmlEventsList

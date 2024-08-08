@@ -10,9 +10,5 @@ export default function AppLayout({children}) {
         return <Loading/>
     }
 
-    return (
-        <div className="w-full">
-            {children}
-        </div>
-    )
+    return children
 }

@@ -1,20 +1,20 @@
 import Axios from 'axios'
 
-const ExecutionEnvironment = require('exenv');
+const ExecutionEnvironment = require('exenv')
 
-let baseUrl = process.env.BACKEND_URL;
+let baseUrl = process.env.BACKEND_URL
 
 if (!ExecutionEnvironment.canUseDOM) {
-    const baseUrlHostName = (new URL(baseUrl)).hostname;
-    const isDocker = process.env.IS_DOCKER;
+    const baseUrlHostName = (new URL(baseUrl)).hostname
+    const isDocker = process.env.IS_DOCKER
 
     switch (true) {
         case isDocker === '1':
         case isDocker === 1:
         case isDocker === 'true':
         case isDocker === true:
-            baseUrl = baseUrl.replace(baseUrlHostName, 'host.docker.internal');
-            break;
+            baseUrl = baseUrl.replace(baseUrlHostName, 'host.docker.internal')
+            break
     }
 }
 

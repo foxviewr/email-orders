@@ -20,6 +20,7 @@ services:
             context: backend
             dockerfile: Dockerfile
         container_name: email-orders-backend
+        env_file: './.env'
         ports:
             - ${APP_PORT}:${APP_PORT}
         volumes:

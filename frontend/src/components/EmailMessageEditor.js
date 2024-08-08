@@ -2,7 +2,6 @@
 
 import axios from "@/lib/axios"
 import {useState} from 'react'
-import {useRouter} from 'next/navigation'
 import {parseHtml} from "@/components/RenderHtml"
 
 export default function EmailMessageEditor({
@@ -12,17 +11,17 @@ export default function EmailMessageEditor({
                                                recipientName,
                                                subject,
                                                inReplyTo,
+                                               getOrderData,
                                            }) {
-    const router = useRouter()
     const [replyMessage, setReplyMessage] = useState('')
     const [loading, setLoading] = useState(false)
     const [errorMessage, setErrorMessage] = useState(null)
 
-    async function onSubmit(event) {
+    function onSubmit(event) {
         setLoading(true)
-        try {
-            event.preventDefault()
-            const response = await axios.post(`/api/mailgun/send-reply`, {
+        event.preventDefault()
+        axios
+            .post(`/api/email/send-reply`, {
                 sender: sender,
                 senderName: senderName,
                 recipient: recipient,
@@ -32,18 +31,17 @@ export default function EmailMessageEditor({
                 'In-Reply-To': inReplyTo,
                 'Message-Id': '----------------',
             })
-
-            router.refresh()
-            setReplyMessage('')
-            setLoading(false)
-            setErrorMessage(null)
-
-            return response.data
-        } catch (error) {
-            setLoading(false)
-            setErrorMessage(error.message)
-            throw error
-        }
+            .then(() => {
+                setReplyMessage('')
+                setLoading(false)
+                setErrorMessage(null)
+                getOrderData()
+            })
+            .catch(error => {
+                if (error.response.status !== 404) throw error
+                setErrorMessage(error.message)
+                setLoading(false)
+            })
     }
 
     return (
