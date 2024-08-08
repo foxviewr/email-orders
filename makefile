@@ -60,10 +60,10 @@ docker-ngrok-backend: .env
 		http host.docker.internal:$(APP_PORT)
 
 docker-backend-shell:
-	@docker exec -it email-orders-backend /bin/bash
+	@docker exec -it email-orders:backend /bin/bash
 
 docker-frontend-shell:
-	@docker exec -it email-orders-frontend /bin/bash
+	@docker exec -it email-orders:frontend /bin/bash
 
 docker-stop:
 	@docker compose down
@@ -72,9 +72,9 @@ docker-delete:
 	@docker compose rm -s -f -v database
 	@docker rmi mariadb
 	@docker compose rm -s -f -v backend
-	@docker rmi email-orders-backend
+	@docker rmi email-orders:backend
 	@docker compose rm -s -f -v frontend
-	@docker rmi email-orders-frontend
+	@docker rmi email-orders:frontend
 
 delete-dependencies:
 	@rm -rf backend/vendor
@@ -91,7 +91,7 @@ remove-all:
 
 reset-backend:
 	@docker compose rm -s -f -v backend
-	@docker rmi email-orders-backend
+	@docker rmi email-orders:backend
 	@rm -rf backend/vendor
 	@docker compose build
 	@docker compose run --rm backend make install
@@ -99,7 +99,7 @@ reset-backend:
 
 reset-frontend:
 	@docker compose rm -s -f -v frontend
-	@docker rmi email-orders-frontend
+	@docker rmi email-orders:frontend
 	@rm -rf frontend/node_modules
 	@rm -rf frontend/.next
 	@docker compose up -d
