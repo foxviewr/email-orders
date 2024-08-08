@@ -17,7 +17,8 @@ export default async function Orders() {
         <div className="w-full">
             <PageTitle>Orders</PageTitle>
             <div className="flex flex-col mt-3">
-                {orders.map((order, index) => {
+                {!orders.length && <p>No orders found</p>}
+                {orders.length > 0 && orders.map((order, index) => {
                     return (
                         <a
                             className="grid grid-cols-12 gap-1 bg-white p-6 mx-2 my-1 cursor-pointer rounded-lg hover:bg-gray-200"
