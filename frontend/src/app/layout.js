@@ -3,6 +3,18 @@ import '@/app/global.css'
 import Header from "@/app/Header"
 import Footer from "@/app/Footer"
 
+export const metadata = {
+    icons: {
+        icon: '/favicon.svg',
+    },
+    title: 'Email Orders',
+    description: 'Email Orders is an email-based ordering platform',
+    openGraph: {
+        title: 'Email Orders',
+        description: 'Email Orders is an email-based ordering platform',
+    },
+}
+
 export default function RootLayout({children}) {
     return (
         <html lang="en" className={NunitoFont.className}>

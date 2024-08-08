@@ -2,7 +2,7 @@
     "name": "email-orders-frontend",
     "description": "The frontend for an email-based ordering platform",
     "author": "Pedro Teles",
-    "website": "https://github.com/foxviewr/",
+    "website": "https://github.com/foxviewr/email-orders",
     "version": "0.1.0",
     "private": true,
     "scripts": {

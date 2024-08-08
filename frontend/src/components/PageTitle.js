@@ -3,7 +3,7 @@ import {Space_GroteskFont} from "@/lib/fonts"
 export default function PageTitle({children}) {
     return (
         <div className="flex items-center mt-5">
-            <svg viewBox="0 -1 24 26"
+            <svg viewBox="0 0 24 24"
                  fill="#e11d48"
                  xmlns="http://www.w3.org/2000/svg"
                  className="h-12 w-auto text-gray-700">

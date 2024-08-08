@@ -12,7 +12,7 @@ export default function Footer() {
                     </svg>
 
                     <a
-                        href="https://github.com/foxviewr/"
+                        href="https://github.com/foxviewr/email-orders"
                         target="_blank"
                         rel="noreferrer"
                         className="ml-1 underline">

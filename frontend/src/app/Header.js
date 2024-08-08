@@ -9,7 +9,7 @@ export default function Header() {
                 href="/"
                 aria-label="Home"
             >
-                <svg viewBox="0 -1 24 26"
+                <svg viewBox="0 0 24 24"
                      fill="white"
                      xmlns="http://www.w3.org/2000/svg"
                      className="h-16 w-auto text-gray-700 sm:h-20">
