@@ -48,7 +48,7 @@ Route
             ::post('store', [EmailController::class, 'store'])
             ->middleware((function () {
                 return [match (true) {
-                    config('mail.default') === 'mailgun' => ValidateMailgunWebhook::class,
+                    config('mail.incoming.middleware') === 'mailgun' => ValidateMailgunWebhook::class,
                     // ... condition => middleware
                     default => null,
                 }];
