@@ -23,6 +23,7 @@ default:
 	@echo "  ${GREEN}delete-dependencies${NORMAL}		Delete the backend and frontend dependencies"
 	@echo "  ${GREEN}delete-database-data${NORMAL}		Delete the app database data"
 	@echo "  ${GREEN}remove-all${NORMAL}			Delete all containers, images, dependencies and database data"
+	@echo "  ${GREEN}reset-backend${NORMAL}			Delete, rebuild, and start the backend container, image and dependencies"
 	@echo "  ${GREEN}reset-frontend${NORMAL}		Delete, rebuild, and start the frontend container, image and dependencies"
 	@echo "  ${GREEN}reset-all${NORMAL}			Delete, rebuild, and start all containers, images, dependencies and database data\n"
 	@echo "${YELLOW}Options:${NORMAL}"
@@ -87,6 +88,14 @@ remove-all:
 	@make docker-delete
 	@make delete-dependencies
 	@make delete-database-data
+
+reset-backend:
+	@docker compose rm -s -f -v backend
+	@docker rmi email-orders-backend
+	@rm -rf backend/vendor
+	@docker compose build
+	@docker compose run --rm backend make install
+	@docker compose up -d
 
 reset-frontend:
 	@docker compose rm -s -f -v frontend
