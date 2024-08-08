@@ -57,7 +57,7 @@ The endpoint controller has the following validation rules:
 
 You can execute a `POST` request to the previously mentioned API endpoint with the proper request inputs to simulate an email being forward to the application.
 
-#### Testing incoming emails with Mailgun
+#### > Testing incoming emails with Mailgun
 If you have a *Mailgun* and *Ngrok* accounts, and setup all the respective `.env` variables, you can use these services to simulate a more real-life scenario.
 
 Make sure you have the `.env` variable `${MAIL_INCOMING_MIDDLEWARE}` set to `mailgun`.
