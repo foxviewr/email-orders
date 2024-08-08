@@ -11,7 +11,7 @@ import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 export default function ForgotPassword() {
     const {forgotPassword} = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: '/dashboard',
+        redirectIfAuthenticated: '/orders',
     })
 
     const [email, setEmail] = useState('')
