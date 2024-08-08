@@ -1,18 +1,14 @@
 import axios from '@/lib/axios'
-import RenderHtml from "@/components/RenderHtml";
-import EmailMessageEditor from "@/components/EmailMessageEditor";
+import RenderHtml from "@/components/RenderHtml"
+import EmailMessageEditor from "@/components/EmailMessageEditor"
 
 async function getOrderByUuid(uuid) {
-    try {
-        const response = await axios.get(`/api/orders/get/${uuid}`);
-        return response.data ?? null;
-    } catch (error) {
-        throw error;
-    }
+    const response = await axios.get(`/api/orders/get/${uuid}`)
+    return response.data ?? null
 }
 
 export default async function Order({params}) {
-    const order = await getOrderByUuid(params.uuid);
+    const order = await getOrderByUuid(params.uuid)
 
     return (
         <>

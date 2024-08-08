@@ -14,6 +14,7 @@ export default function Footer() {
                     <a
                         href="https://github.com/foxviewr/"
                         target="_blank"
+                        rel="noreferrer"
                         className="ml-1 underline">
                         GitHub
                     </a>

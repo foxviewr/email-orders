@@ -1,7 +1,7 @@
 import {NunitoFont} from '@/lib/fonts'
 import '@/app/global.css'
-import Header from "@/app/Header";
-import Footer from "@/app/Footer";
+import Header from "@/app/Header"
+import Footer from "@/app/Footer"
 
 export default function RootLayout({children}) {
     return (
