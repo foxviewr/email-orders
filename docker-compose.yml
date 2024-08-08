@@ -1,0 +1,80 @@
+services:
+    database:
+        image: mariadb
+        restart: always
+        container_name: email-orders-database
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - ${DB_PORT}:3306
+        volumes:
+            - ./.db-data:/var/lib/mysql
+        networks:
+            - private
+
+    backend:
+        build:
+            context: backend
+            dockerfile: Dockerfile
+        container_name: email-orders-backend
+        ports:
+            - ${APP_PORT}:${APP_PORT}
+        volumes:
+            - ./backend:/var/www/html
+        command: make start port=${APP_PORT}
+        networks:
+            - public
+            - private
+        depends_on:
+            - database
+
+    frontend:
+        build:
+            context: frontend
+            dockerfile: Dockerfile
+            args:
+                - BACKEND_URL=${BACKEND_URL}
+                - IS_DOCKER=${IS_DOCKER}
+                - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+                - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+        container_name: email-orders-frontend
+        volumes:
+            - ./frontend/:/frontend/
+        ports:
+            - ${FRONTEND_PORT}:${FRONTEND_PORT}
+        command: npm run docker:start:${APP_ENV:-local} -- -p ${FRONTEND_PORT}
+        depends_on:
+            - backend
+        networks:
+            - public
+
+    maildev:
+        image: maildev/maildev
+        restart: always
+        container_name: email-orders-maildev
+        environment:
+            - TZ=${MAILDEV_TIMEZONE}
+            - MAILDEV_WEB_PORT=${MAILDEV_WEB_PORT}
+            - MAILDEV_OUTGOING_HOST=${MAILDEV_OUTGOING_HOST}
+            - MAILDEV_SMTP_PORT=${MAILDEV_SMTP_PORT}
+            - MAILDEV_OUTGOING_USER=${MAILDEV_OUTGOING_USER}
+            - MAILDEV_OUTGOING_PASS=${MAILDEV_OUTGOING_PASS}
+            - MAILDEV_OUTGOING_SECURE=${MAILDEV_OUTGOING_SECURE}
+        ports:
+            - "1080:1080"
+            - "1025:1025"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "1m"
+        networks:
+            - private
+        depends_on:
+            - backend
+
+networks:
+    private:
+    public:
