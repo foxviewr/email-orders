@@ -1,6 +1,6 @@
 {
-    "name": "email-orders",
-    "description": "An email-based ordering platform",
+    "name": "email-orders-frontend",
+    "description": "The frontend for an email-based ordering platform",
     "author": "Pedro Teles",
     "website": "https://github.com/foxviewr/",
     "version": "0.1.0",

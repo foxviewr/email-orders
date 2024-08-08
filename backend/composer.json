@@ -1,7 +1,10 @@
 {
-    "name": "laravel/laravel",
+    "name": "email-orders/backend",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "An email-based ordering platform",
+    "author": "Pedro Teles",
+    "website": "https://github.com/foxviewr/",
+    "version": "0.1.0",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
