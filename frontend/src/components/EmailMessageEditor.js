@@ -1,9 +1,8 @@
 'use client'
 
-import axios from "@/lib/axios";
-import {useState} from 'react';
-import {useRouter} from 'next/navigation';
-import {parseHtml} from "@/components/RenderHtml";
+import axios from "@/lib/axios"
+import {useState} from 'react'
+import {parseHtml} from "@/components/RenderHtml"
 
 export default function EmailMessageEditor({
                                                sender,
@@ -12,17 +11,17 @@ export default function EmailMessageEditor({
                                                recipientName,
                                                subject,
                                                inReplyTo,
+                                               getOrderData,
                                            }) {
-    const router = useRouter();
-    const [replyMessage, setReplyMessage] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(null);
+    const [replyMessage, setReplyMessage] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [errorMessage, setErrorMessage] = useState(null)
 
-    async function onSubmit(event) {
-        setLoading(true);
-        try {
-            event.preventDefault()
-            const response = await axios.post(`/api/mailgun/send-reply`, {
+    function onSubmit(event) {
+        setLoading(true)
+        event.preventDefault()
+        axios
+            .post(`/api/email/send-reply`, {
                 sender: sender,
                 senderName: senderName,
                 recipient: recipient,
@@ -31,19 +30,18 @@ export default function EmailMessageEditor({
                 'body-html': parseHtml(replyMessage),
                 'In-Reply-To': inReplyTo,
                 'Message-Id': '----------------',
-            });
-
-            router.refresh();
-            setReplyMessage('');
-            setLoading(false);
-            setErrorMessage(null);
-
-            return response.data;
-        } catch (error) {
-            setLoading(false);
-            setErrorMessage(error.message);
-            throw error;
-        }
+            })
+            .then(() => {
+                setReplyMessage('')
+                setLoading(false)
+                setErrorMessage(null)
+                getOrderData()
+            })
+            .catch(error => {
+                if (error.response.status !== 404) throw error
+                setErrorMessage(error.message)
+                setLoading(false)
+            })
     }
 
     return (
@@ -75,7 +73,7 @@ export default function EmailMessageEditor({
                         value={replyMessage}
                         className="p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         required
-                        placeholder="Write your answer here..."></textarea>
+                        placeholder="Write your answer here..."/>
                 </div>
             </div>
             <div className="flex mt-2 justify-end">
@@ -86,10 +84,10 @@ export default function EmailMessageEditor({
             <div className="flex mt-2 justify-end">
                 <button type="submit"
                         disabled={loading}
-                        className={`${loading ? 'bg-gray-600' : 'bg-rose-600 hover:bg-rose-700'} focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-32 items-center px-5 py-2.5 text-sm font-medium text-center text-white rounded-lg`}>
+                        className={`${loading ? 'bg-gray-600' : 'bg-rose-600 hover:bg-rose-700'} focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-32 items-center px-5 py-2.5 text-center text-white`}>
                     {loading ? 'Sending...' : 'Reply'}
                 </button>
             </div>
         </form>
-    );
+    )
 }

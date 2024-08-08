@@ -10,10 +10,10 @@ default:
 	@echo "${RED}Please specify a target. Check inside the ${YELLOW}./makefile${RED} for available targets.${NO_COLOR}"
 
 install:
-	composer install --no-interaction
-	php artisan migrate --force --no-interaction
-	php artisan cache:clear --no-interaction
-	php artisan optimize --no-interaction
+	@composer install --no-interaction
+	@php artisan migrate --force --no-interaction
+	@php artisan cache:clear --no-interaction
+	@php artisan optimize --no-interaction
 
 start:
-	php artisan serve --port=$(port) --host=0.0.0.0 --no-interaction
+	@php artisan serve --port=$(port) --host=0.0.0.0 --no-interaction

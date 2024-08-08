@@ -123,4 +123,18 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Configuration
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'is_docker' => env('IS_DOCKER', false),
+    'host' => explode('://',
+            (env('APP_PORT')
+                ? str_replace(':' . env('APP_PORT'), '', env('APP_URL', 'http://localhost'))
+                : env('APP_URL', 'http://localhost')
+            ))[1] ?? 'localhost',
+
 ];

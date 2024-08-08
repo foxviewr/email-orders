@@ -1,7 +1,19 @@
 import {NunitoFont} from '@/lib/fonts'
 import '@/app/global.css'
-import Header from "@/app/Header";
-import Footer from "@/app/Footer";
+import Header from "@/app/Header"
+import Footer from "@/app/Footer"
+
+export const metadata = {
+    icons: {
+        icon: '/favicon.svg',
+    },
+    title: 'Email Orders',
+    description: 'Email Orders is an email-based ordering platform',
+    openGraph: {
+        title: 'Email Orders',
+        description: 'Email Orders is an email-based ordering platform',
+    },
+}
 
 export default function RootLayout({children}) {
     return (

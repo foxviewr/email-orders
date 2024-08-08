@@ -23,7 +23,7 @@ class ValidateMailgunWebhook
             return $next($request);
         }
 
-        abort(Response::HTTP_FORBIDDEN, $this->buildSignature($request) . ' | ' . $request->input('signature') . ' | ' . config('services.mailgun.secret'));
+        abort(Response::HTTP_FORBIDDEN);
     }
 
     protected function buildSignature($request): string
@@ -31,14 +31,14 @@ class ValidateMailgunWebhook
         return hash_hmac(
             algo: 'sha256',
             data: $request->input('timestamp') . $request->input('token'),
-            key: config('services.mailgun.secret'),
+            key: config('services.mailgun.webhook_secret'),
         );
     }
 
     protected function verify($request): bool
     {
-        if (abs(time() - $request->input('timestamp')) > 15) {
-            //return false;
+        if (abs(time() - $request->input('timestamp')) > 60) {
+            return false;
         }
 
         return $this->buildSignature($request) === $request->input('signature');

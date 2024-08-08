@@ -64,7 +64,9 @@ return [
 
         'mail-attachments' => [
             'driver' => 'local',
-            'root' => storage_path('mail/attachments'),
+            'root' => storage_path('app/public/mail/attachments'),
+            'url' => env('APP_URL').'/storage/mail/attachments',
+            'visibility' => 'public',
             'throw' => false,
         ],
 

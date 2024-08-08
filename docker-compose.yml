@@ -20,6 +20,7 @@ services:
             context: backend
             dockerfile: Dockerfile
         container_name: email-orders-backend
+        env_file: './.env'
         ports:
             - ${APP_PORT}:${APP_PORT}
         volumes:
@@ -50,30 +51,6 @@ services:
             - backend
         networks:
             - public
-
-    maildev:
-        image: maildev/maildev
-        restart: always
-        container_name: email-orders-maildev
-        environment:
-            - TZ=${MAILDEV_TIMEZONE}
-            - MAILDEV_WEB_PORT=${MAILDEV_WEB_PORT}
-            - MAILDEV_OUTGOING_HOST=${MAILDEV_OUTGOING_HOST}
-            - MAILDEV_SMTP_PORT=${MAILDEV_SMTP_PORT}
-            - MAILDEV_OUTGOING_USER=${MAILDEV_OUTGOING_USER}
-            - MAILDEV_OUTGOING_PASS=${MAILDEV_OUTGOING_PASS}
-            - MAILDEV_OUTGOING_SECURE=${MAILDEV_OUTGOING_SECURE}
-        ports:
-            - "1080:1080"
-            - "1025:1025"
-        logging:
-            driver: "json-file"
-            options:
-                max-size: "1m"
-        networks:
-            - private
-        depends_on:
-            - backend
 
 networks:
     private:
