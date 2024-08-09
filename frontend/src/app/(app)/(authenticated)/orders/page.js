@@ -31,16 +31,16 @@ export default function Orders() {
                 <>
                     <div className="w-full">
                         <PageTitle>Orders</PageTitle>
-                        <div className="flex flex-col mt-3">
+                        <div className="flex flex-col mt-6">
                             {!orders.length && <p>No orders found.</p>}
                             {orders.length > 0 && orders.map((order, index) => {
                                 return (
                                     <a
-                                        className="grid grid-cols-12 gap-1 bg-white p-6 mx-2 my-1 cursor-pointer rounded-lg hover:bg-gray-200"
+                                        className="relative md:static flex flex-col md:flex-row bg-white p-6 pr-12 mx-2 my-1 cursor-pointer rounded-lg hover:bg-gray-200"
                                         href={`/orders/${order.uuid}`}
                                         key={index}
                                     >
-                                        <div className="flex col-span-3 items-center">
+                                        <div className="flex flex-col md:flex-row items-start md:items-center overflow-x-auto md:overflow-x-hidden">
                                             <svg
                                                 fill="none"
                                                 stroke="currentColor"
@@ -54,14 +54,14 @@ export default function Orders() {
                                             </svg>
 
                                             <div
-                                                className="flex flex-col intems-center ml-4 text-lg leading-7 font-semibold">
+                                                className="flex flex-col md:ml-4 text-lg leading-7 font-semibold">
                                                 <small className="leading-tight text-gray-600">Order number</small>
                                                 <strong className="text-xl">#{order.number}</strong>
                                             </div>
                                         </div>
 
                                         <div
-                                            className="col-span-7 text-sm">
+                                            className="text-sm md:pl-5 md:flex-grow overflow-x-auto md:overflow-x-hidden">
                                             <div>
                                                 Customer name: <strong>{order.customer_name}</strong>
                                             </div>
@@ -73,7 +73,7 @@ export default function Orders() {
                                             </div>
                                         </div>
 
-                                        <div className="flex col-span-2 items-center justify-end">
+                                        <div className="absolute md:static right-3 top-0 bottom-0 flex items-center justify-end">
                                             <svg
                                                 fill="none"
                                                 stroke="currentColor"

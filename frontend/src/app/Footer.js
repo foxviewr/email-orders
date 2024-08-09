@@ -1,8 +1,8 @@
 export default function Footer() {
     return (
-        <div className="flex justify-center mt-4 sm:items-center sm:justify-between">
+        <div className="flex flex-col sm:flex-row justify-center mt-4 items-center sm:justify-between">
             <div className="text-center text-sm text-white sm:text-left">
-                <div className="flex items-center">
+                <div className="flex items-center mb-2.5 sm:mb-0">
                     <svg
                         fill="white"
                         viewBox="0 0 32 32"

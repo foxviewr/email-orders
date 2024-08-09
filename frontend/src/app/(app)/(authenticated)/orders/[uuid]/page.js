@@ -37,8 +37,8 @@ export default function Order({params}) {
                     {order !== null && (
                         <>
                             <div className="w-full">
-                                <div className="flex bg-gray-800 text-white p-6 mx-2 my-1 rounded-lg">
-                                    <div className="flex flex-auto items-center">
+                                <div className="flex flex-col md:flex-row bg-gray-800 text-white p-6 mx-2 my-1 rounded-lg">
+                                    <div className="flex flex-col md:items-center overflow-x-auto md:overflow-x-hidden">
                                         <svg
                                             fill="none"
                                             stroke="white"
@@ -52,7 +52,7 @@ export default function Order({params}) {
                                         </svg>
 
                                         <div
-                                            className="flex flex-col intems-center ml-4 text-lg leading-7 font-semibold">
+                                            className="flex flex-col intems-center md:ml-4 text-lg leading-7 font-semibold">
                                             <small className="leading-tight text-gray-400">Order
                                                 number</small>
                                             <strong className="text-xl">#{order.number}</strong>
@@ -60,7 +60,7 @@ export default function Order({params}) {
                                     </div>
 
                                     <div
-                                        className="flex flex-col flex-auto mt-2 ml-12 text-sm">
+                                        className="flex flex-col flex-auto mt-2 md:ml-12 text-sm overflow-x-auto md:overflow-x-hidden">
                                         <div>
                                             Customer name: <strong>{order.customer_name}</strong>
                                         </div>
@@ -80,7 +80,7 @@ export default function Order({params}) {
                                             key={`email-${index}`}
                                         >
                                             <div
-                                                className="flex flex-auto items-center bg-gray-100 p-6 rounded-lg rounded-">
+                                                className="relative flex flex-col lg:flex-row items-baseline lg:items-center bg-gray-100 p-6 rounded-lg rounded-">
                                                 <svg
                                                     fill="none"
                                                     stroke="currentColor"
@@ -88,45 +88,48 @@ export default function Order({params}) {
                                                     strokeLinejoin="round"
                                                     strokeWidth="2"
                                                     viewBox="0 0 24 24"
-                                                    className="w-8 h-8 text-gray-500">
+                                                    className="absolute lg:static right-5 w-8 h-8 text-gray-500">
                                                     <path
                                                         d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
                                                 </svg>
 
-                                                <div className="flex flex-col flex-auto mt-2 ml-12 text-sm">
-                                                    <div>
-                                                        From: <strong>{email.from}</strong>
+                                                <div className="w-full mt-2 lg:ml-12 text-sm">
+                                                    <div className="flex flex-col overflow-x-auto mr-10 lg:mr-0">
+                                                        <div>
+                                                            From: <strong>{email.from}</strong>
+                                                        </div>
+                                                        <div>
+                                                            To: <strong>{email.to}</strong>
+                                                        </div>
+                                                        <div>
+                                                            Date: <strong>{email.created_at}</strong>
+                                                        </div>
+                                                        {email?.attachments.length > 0 && (
+                                                            <>
+                                                                <div>Attachments:</div>
+                                                                {email?.attachments.map((attachment, index) => {
+                                                                    return (
+                                                                        <a
+                                                                            key={`${email.uuid}-${index}`}
+                                                                            href={attachment.download_path}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                            className="block underline"
+                                                                        >
+                                                                            <strong>{attachment.file_name}</strong>
+                                                                        </a>
+                                                                    )
+                                                                })}
+                                                            </>
+                                                        )}
+                                                        <div>
+                                                            Message:
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        To: <strong>{email.to}</strong>
-                                                    </div>
-                                                    <div>
-                                                        Date: <strong>{email.created_at}</strong>
-                                                    </div>
-                                                    {email?.attachments.length > 0 && (
-                                                        <>
-                                                            <div>Attachments:</div>
-                                                            {email?.attachments.map((attachment, index) => {
-                                                                return (
-                                                                    <a
-                                                                        key={`${email.uuid}-${index}`}
-                                                                        href={attachment.download_path}
-                                                                        target="_blank"
-                                                                        rel="noreferrer"
-                                                                        className="block underline"
-                                                                    >
-                                                                        <strong>{attachment.file_name}</strong>
-                                                                    </a>
-                                                                )
-                                                            })}
-                                                        </>
-                                                    )}
-                                                    <div>
-                                                        Message:
-                                                    </div>
+
                                                 </div>
                                             </div>
-                                            <div className="flex p-6 mx-2 mt-4 rounded-lg">
+                                            <div className="flex overflow-x-auto p-6 mx-2 mt-4 rounded-lg">
                                                 <RenderHtml html={email.body}/>
                                             </div>
                                         </div>
