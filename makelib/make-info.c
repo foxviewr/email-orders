@@ -1,5 +1,5 @@
-include ./ansi-sgr.c
-include ./app-info.c
+include /$(PWD)/makelib/ansi-sgr.c
+include /$(PWD)/makelib/app-info.c
 
 define make_info
     @echo "${BLUE_BACKGROUND}${BOLD}${WHITE} .::EMAIL ORDERS::. ${NORMAL} ${GREEN}Makefile${NORMAL}\n"

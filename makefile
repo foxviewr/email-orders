@@ -1,6 +1,6 @@
 include ./.env
-include ./makelib/ansi-sgr.c
-include ./make-info.c
+include /$(PWD)/makelib/ansi-sgr.c
+include /$(PWD)/makelib/make-info.c
 
 # targets
 default:
