@@ -43,7 +43,7 @@ docker-frontend-shell:
 	@docker exec -it email-orders:frontend /bin/bash
 
 docker-stop:
-	@docker compose down
+	@docker compose stop
 
 docker-delete:
 	@docker compose rm -s -f -v database
