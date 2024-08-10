@@ -1,6 +1,6 @@
 include ./.env
-include ./makelib/ansi-sgr.c
-include ./make-info.c
+include /$(PWD)/makelib/ansi-sgr.c
+include /$(PWD)/makelib/make-info.c
 
 # targets
 default:
@@ -43,7 +43,7 @@ docker-frontend-shell:
 	@docker exec -it email-orders:frontend /bin/bash
 
 docker-stop:
-	@docker compose down
+	@docker compose stop
 
 docker-delete:
 	@docker compose rm -s -f -v database
