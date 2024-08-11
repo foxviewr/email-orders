@@ -37,10 +37,10 @@ docker-ngrok-backend: .env
 		http host.docker.internal:$(APP_PORT)
 
 docker-backend-shell:
-	@docker exec -it email-orders:backend /bin/bash
+	@docker exec -it email-orders-backend /bin/bash
 
 docker-frontend-shell:
-	@docker exec -it email-orders:frontend /bin/bash
+	@docker exec -it email-orders-frontend /bin/bash
 
 docker-stop:
 	@docker compose stop
