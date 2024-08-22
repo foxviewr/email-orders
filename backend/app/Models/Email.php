@@ -23,6 +23,7 @@ class Email extends Model
         'inReplyTo',
         'from',
         'to',
+        'order_uuid',
     ];
 
     public function order(): BelongsTo

@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CustomerController extends Controller
 {
-    public function getAll()
+    public function getAll(): AnonymousResourceCollection
     {
-        return array_map(function (array $customer) {
-            return [
-                'uuid' => $customer['uuid'],
-                'customer_name' => $customer['name'],
-                'customer_email' => $customer['email'],
-                'orders_count' => count($customer['orders']),
-            ];
-        }, Customer::with(['orders'])->get()->toArray());
+        $customers = Customer::with(['orders'])
+            ->withCount(['orders'])
+            ->get();
+
+        return CustomerResource::collection($customers);
     }
 }

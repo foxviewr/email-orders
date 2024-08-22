@@ -18,6 +18,7 @@ class Order extends Model
     protected $fillable = [
         'number',
         'status',
+        'customer_uuid',
     ];
 
     public function customer(): BelongsTo

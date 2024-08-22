@@ -3,57 +3,52 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\OrderController;
-use App\Http\Middleware\ValidateMailgunWebhook;
+use App\Http\Middleware\ValidateMailgunMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route
-    ::get('/user', function (Request $request) {
+// api/user/
+Route::get('/user', static function (Request $request) {
         return $request->user();
-    })->middleware(['auth:sanctum']);
+    })
+    ->middleware(['auth:sanctum'])
+;
 
-Route
-    ::group([
-        'prefix' => 'customers',
-    ], function () {
-        Route
-            ::get('get/all', [CustomerController::class, 'getAll'])
-            ->middleware(['auth:sanctum']);
-    });
+// api/customers/
+Route::group(['prefix' => 'customers',], static function () {
+    // api/customers/get/all
+    Route::get('get/all', [CustomerController::class, 'getAll'])
+        ->middleware(['auth:sanctum']);
+});
 
-Route
-    ::group([
-        'prefix' => 'orders',
-    ], function () {
-        Route::group([
-            'prefix' => 'get',
-        ], function () {
-            Route
-                ::get('all', [OrderController::class, 'getAll'])
+// api/orders
+Route::group(['prefix' => 'orders',], static function () {
+        // api/orders/get/
+        Route::group(['prefix' => 'get'], static function () {
+            // api/orders/get/all
+            Route::get('all', [OrderController::class, 'getAll'])
                 ->middleware(['auth:sanctum']);
-            Route
-                ::post('customer/{customerUuid}', [OrderController::class, 'getByCustomerUuid'])
+
+            // api/orders/get/customer/{customerUuid}
+            Route::post('customer/{customerUuid}', [OrderController::class, 'getByCustomerUuid'])
                 ->middleware(['auth:sanctum']);
-            Route
-                ::get('{uuid}', [OrderController::class, 'getByUuid'])
+
+            // api/orders/get/{uuid}
+            Route::get('{uuid}', [OrderController::class, 'getByUuid'])
                 ->middleware(['auth:sanctum']);
         });
     });
 
-Route
-    ::group([
-        'prefix' => 'email',
-    ], function () {
-        Route
-            ::post('store', [EmailController::class, 'store'])
-            ->middleware((function () {
-                return [match (true) {
-                    config('mail.incoming.middleware') === 'mailgun' => ValidateMailgunWebhook::class,
-                    // ... condition => middleware
-                    default => null,
-                }];
-            })());
-        Route
-            ::post('send-reply', [EmailController::class, 'sendReply'])
+// api/email
+Route::group(['prefix' => 'email',], static function () {
+        // api/email/store
+        Route::post('store', [EmailController::class, 'store'])
+            ->middleware(
+                ValidateMailgunMiddleware::class
+                // other custom middlewares
+            );
+
+        // api/email/send-reply
+        Route::post('send-reply', [EmailController::class, 'sendReply'])
             ->middleware(['auth:sanctum']);
     });
