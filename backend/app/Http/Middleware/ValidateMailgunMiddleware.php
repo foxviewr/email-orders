@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ValidateMailgunWebhook
+class ValidateMailgunMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,14 +15,22 @@ class ValidateMailgunWebhook
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // only if middleware configuration is mailgun
+        if (!(config('mail.incoming.middleware') === 'mailgun')) {
+            return $next($request);
+        }
+
+        // only if request is a POST
         if (!$request->isMethod('post')) {
             abort(Response::HTTP_METHOD_NOT_ALLOWED, 'Only POST requests are allowed.');
         }
 
+        // verify the request
         if ($this->verify($request)) {
             return $next($request);
         }
 
+        // request invalid, abort with 403
         abort(Response::HTTP_FORBIDDEN);
     }
 
@@ -37,9 +45,9 @@ class ValidateMailgunWebhook
 
     protected function verify($request): bool
     {
-        if (abs(time() - $request->input('timestamp')) > 60) {
-            return false;
-        }
+//        if (abs(time() - $request->input('timestamp')) > 60) {
+//            return false;
+//        }
 
         return $this->buildSignature($request) === $request->input('signature');
     }
