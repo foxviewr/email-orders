@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\EmailPostRequest;
+use App\Http\Requests\SendEmailPostRequest;
+use App\Http\Requests\StoreEmailPostRequest;
+use App\Http\Resources\EmailResource;
 use App\Models\Customer;
 use App\Models\Email;
 use App\Models\Order;
@@ -10,21 +13,13 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Mail\Message;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 class EmailController extends Controller
 {
-    /**
-     * @param Exception $e
-     * @return JsonResponse
-     */
-    protected function exceptionHandler(Exception $e): JsonResponse
-    {
-        app('log')->debug($e);
-        return new JsonResponse(['status' => 'not_ok'], 500);
-    }
-
     /**
      * @param string $from
      * @return string
@@ -45,134 +40,101 @@ class EmailController extends Controller
     {
         do {
             $number = sprintf('%08d', random_int(999, 999999));
-        } while (Order::where('number', $number)->first());
+        } while (Order::query()->where('number', $number)->first());
 
         return $number;
     }
 
     /**
-     * @param EmailPostRequest $request
-     * @return JsonResponse
+     * @param StoreEmailPostRequest $request
+     * @return EmailResource
+     * @throws Exception
      */
-    public function store(EmailPostRequest $request): JsonResponse
+    public function store(StoreEmailPostRequest $request): EmailResource
     {
-        try {
-            // validate the request
-            $validatedFields = $request->validated();
+        // assign an existing or new customer
+        $customer = Customer::query()->createOrFirst(['email' => $request->input('sender')], [
+            'email' => $request->input('sender'),
+            'name' => $this->getCustomerName($request->input('from'))
+        ]);
 
-            // prepare the email model
-            $email = new Email;
-            $email->sender = $validatedFields['sender'];
-            $email->recipient = $validatedFields['recipient'];
-            $email->subject = $validatedFields['subject'];
-            $email->body = $validatedFields['body-html'];
-            $email->messageId = $validatedFields['Message-Id'];
-            $email->inReplyTo = $validatedFields['In-Reply-To'] ?? null;
-            $email->from = $validatedFields['from'] ?? ($validatedFields['From'] ?? null);
-            $email->to = $validatedFields['to'] ?? ($validatedFields['To'] ?? null);
-
-            // assign an existing or new order
-            $order = null;
-            if (!empty($validatedFields['In-Reply-To'])) {
-                $order = (Email::where('messageId', $validatedFields['In-Reply-To'])->first())->order;
-            }
-            if (!$order) { // new order
-                $order = new Order;
-                $order->number = $this->generateOrderNumber();
-                $order->status = 'open';
-
-                // assign an existing or new customer
-                $customer = Customer::where('email', $email->sender)->first();
-                if (!$customer) { // new customer
-                    $customer = new Customer;
-                    $customer->name = $this->getCustomerName($email->from);
-                    $customer->email = $email->sender;
-                    $customer->save();
-                }
-
-                $order->customer()->associate($customer);
-                $order->save();
-            }
-            $email->order()->associate($order);
-
-            // save the email model in the DB
-            $email->save();
-
-            // loop through each attachment and save them on the local filesystem
-            /** @var UploadedFile $attachment */
-            foreach ($request->allFiles() as $attachment) {
-                Storage::disk('mail-attachments')
-                    ->put(
-                        path: $email->uuid . '_' . $attachment->getClientOriginalName(),
-                        contents: $attachment->getContent()
-                    );
-            }
-
-            // log the request
-            //app('log')->debug($request->all());
-
-            return new JsonResponse(['status' => 'ok']);
+        // assign an existing or new order
+        $order = (Email::query()->where(['messageId' => $request->input('inReplyTo')])->first())?->order;
+        if (!$order) {
+            $order = Order::query()->create([
+                'number' => $this->generateOrderNumber(),
+                'status' => 'open',
+                'customer_uuid' => $customer->uuid,
+            ]);
         }
-        catch (Exception $e) {
-            return $this->exceptionHandler($e);
-        }
+
+        // validate the request and create email model
+        $email = Email::query()->create(array_merge($request->all(), [
+            'order_uuid' => $order->uuid
+        ]));
+
+        // loop through each attachment and save them on the local filesystem
+        /** @var UploadedFile $attachment */
+        collect($request->allFiles())->each(function ($attachment) use($email) {
+            Storage::disk('mail-attachments')
+                ->put(
+                    path: $email->uuid . '_' . $attachment->getClientOriginalName(),
+                    contents: $attachment->getContent()
+                );
+        });
+
+        // log the request
+        //app('log')->debug($request->all());
+
+        return new EmailResource($email);
     }
 
     /**
-     * @param EmailPostRequest $request
-     * @return JsonResponse
+     * @param SendEmailPostRequest $request
+     * @return EmailResource
      */
-    public function sendReply(EmailPostRequest $request): JsonResponse
+    public function sendReply(SendEmailPostRequest $request): EmailResource
     {
-        try {
-            // validate the request
-            $validatedFields = $request->validated();
+        $email = null;
 
-            // validate the inReplyTo
-            if (empty($validatedFields['In-Reply-To'])) {
-                throw new Exception('The inReplyTo is missing or invalid');
+        // send the email
+        Mail::raw($request->input('body'), static function (Message $message) use ($request, &$email) {
+            $message->sender($request->input('sender'));
+            $message->from($request->input('sender'), $request->input('senderName'));
+            $message->to($request->input('recipient'), $request->input('recipientName'));
+            $message->subject($request->input('subject'));
+
+            $headers = $message->getPreparedHeaders();
+            $headers->addIdHeader('In-Reply-To',
+                str_replace('<', '',
+                    str_replace('>', '', $request->input('inReplyTo'))
+                )
+            );
+            $message->setHeaders($headers);
+            $headers = $message->getHeaders();
+
+            // prepare the email model
+            $fields = $request->input();
+            $fields['messageId'] = '<' . $headers->getHeaderBody('Message-Id')[0] . '>';
+            $fields['inReplyTo'] = '<' . $headers->getHeaderBody('In-Reply-To')[0] . '>';
+            $fields['from'] = $headers->getHeaderBody('From')
+                ? $headers->getHeaderBody('From')[0]->toString() : null;
+            $fields['to'] = $headers->getHeaderBody('To')
+                ? $headers->getHeaderBody('To')[0]->toString() : null;
+
+            // fetch the associated order
+            $order = (Email::query()->where('messageId', $request->input('inReplyTo'))->first())->order;
+            if (!$order) {
+                throw new RuntimeException('Order not found for the reply email. Email not sent');
             }
 
-            // send the email
-            Mail::raw($validatedFields['body-html'], function (Message $message) use ($validatedFields) {
-                $message->sender($validatedFields['sender']);
-                $message->from($validatedFields['sender'], $validatedFields['senderName'] ?? null);
-                $message->to($validatedFields['recipient'], $validatedFields['recipientName'] ?? null);
-                $message->subject($validatedFields['subject']);
+            // associate the order
+            $fields['order_uuid'] = $order->uuid;
 
-                $headers = $message->getPreparedHeaders();
-                $headers->addIdHeader('In-Reply-To',
-                    str_replace('<', '',
-                        str_replace('>', '', $validatedFields['In-Reply-To'])));
-                $message->setHeaders($headers);
-                $headers = $message->getHeaders();
+            // create the email
+            $email = Email::query()->create($fields);
+        });
 
-                // prepare the email model
-                $email = new Email;
-                $email->sender = $validatedFields['sender'];
-                $email->recipient = $validatedFields['recipient'];
-                $email->subject = $validatedFields['subject'];
-                $email->body = $message->getTextBody();
-                $email->messageId = '<' . $headers->getHeaderBody('Message-Id')[0] . '>';
-                $email->inReplyTo = '<' . $headers->getHeaderBody('In-Reply-To')[0] . '>';
-                $email->from = $headers->getHeaderBody('From')
-                    ? $headers->getHeaderBody('From')[0]->toString() : null;
-                $email->to = $headers->getHeaderBody('To')
-                    ? $headers->getHeaderBody('To')[0]->toString() : null;
-
-                $order = (Email::where('messageId', $validatedFields['In-Reply-To'])->first())->order;
-                if (!$order) {
-                    throw new Exception('Order not found for the reply email. Email not sent');
-                }
-                $email->order()->associate($order);
-
-                // save the email model in the DB
-                $email->save();
-            });
-
-            return new JsonResponse(['status' => 'ok']);
-        } catch (Exception $e) {
-            return $this->exceptionHandler($e);
-        }
+        return new EmailResource($email);
     }
 }

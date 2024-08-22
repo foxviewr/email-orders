@@ -24,17 +24,9 @@ class EmailPostRequest extends FormRequest
     {
         return [
             'recipient' => 'required|string|max:255',
-            'recipientName' => 'sometimes|string|max:255',
             'sender' => 'required|string|max:255',
-            'senderName' => 'sometimes|string|max:255',
             'subject' => 'required|string|max:255',
-            'body-html' => 'required|string',
-            'Message-Id' => 'required|string|max:255',
-            'In-Reply-To' => 'sometimes|required|string|max:255',
-            'from' => 'sometimes|required|string|max:255',
-            'From' => 'sometimes|required|string|max:255',
-            'to' => 'sometimes|required|string|max:255',
-            'To' => 'sometimes|required|string|max:255',
+            'body' => 'required|string',
         ];
     }
 }
