@@ -18,7 +18,7 @@
         "@headlessui/react": "^1.4.2",
         "axios": "^0.21.1",
         "exenv": "^1.2.2",
-        "next": "^14.2.3",
+        "next": "^14.2.30",
         "node-html-parser": "^6.1.13",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
