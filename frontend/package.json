@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "@headlessui/react": "^1.4.2",
-        "axios": "^0.21.1",
+        "axios": "^0.30.0",
         "exenv": "^1.2.2",
         "next": "^14.2.30",
         "node-html-parser": "^6.1.13",
